@@ -6,30 +6,34 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 export const signUpAction = async (formData: FormData) => {
-  const email = formData.get("email")?.toString()
-  const password = formData.get("password")?.toString()
-  const supabase = await createClient()
-  const origin = (await headers()).get("origin")
+  const email = formData.get("email")?.toString();
+  const password = formData.get("password")?.toString();
+  const supabase = await createClient();
 
   if (!email || !password) {
-    return { error: "Email and password are required" }
+    return { error: "Email and password are required" };
   }
+
+  const emailRedirectTo = process.env.NEXT_PUBLIC_SITE_URL
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+    : undefined;
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo, // Use the environment variable
     },
-  })
+  });
 
   if (error) {
     console.error(`${error.code} ${error.message}`);
     return encodedRedirect("error", "/sign-up", error.message);
-  } else {
-    return redirect("/homepage");
-  }  
-}
+  }
+
+  return redirect("/homepage");
+};
+
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string
