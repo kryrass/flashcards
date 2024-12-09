@@ -11,7 +11,7 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return redirect("https://flashcards-eight-beryl.vercel.app/");
+    return redirect("/sign-up");
   }
 
   const { data: flashcardSets, error } = await supabase
